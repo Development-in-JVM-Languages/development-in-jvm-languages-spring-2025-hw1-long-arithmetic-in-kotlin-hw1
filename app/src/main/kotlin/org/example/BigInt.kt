@@ -8,12 +8,15 @@ class BigInt(private val value: String) : Comparable<BigInt> {
         val numPart = if (value.startsWith("-")) value.substring(1) else value
         require(numPart.isNotEmpty()) { "Invalid input format: $value" }
         digits = numPart.map { it.toString().toInt() }
-        sign = sign()
+        sign = when {
+            digits.all { it == 0 } -> 0
+            value.startsWith("-") -> -1
+            else -> 1
+        }
         normalize()
     }
 
     private fun normalize() {
-        // Remove leading zeros
         var normalizedDigits = digits
         while (normalizedDigits.size > 1 && normalizedDigits[0] == 0) {
             normalizedDigits = normalizedDigits.drop(1)
