@@ -191,7 +191,7 @@ class BigInt(private val value: String) : Comparable<BigInt> {
                 result *= base
             }
             base *= base
-            exponent /= BigInt("2")
+            exponent = exponent / BigInt("2")
         }
         return result
     }
@@ -200,20 +200,20 @@ class BigInt(private val value: String) : Comparable<BigInt> {
     fun pow(exp: Short): BigInt = pow(BigInt(exp.toString()))
     fun pow(exp: Byte): BigInt = pow(BigInt(exp.toString()))
 
-    // Sign function
+
     fun sign(): Int = sign
 
-    // Absolute value
+
     fun abs(): BigInt = if (sign == -1) -this else this
 
-    // String representation
+
     override fun toString(): String = when (sign) {
         -1 -> "-${digits.joinToString("")}"
         0 -> "0"
         else -> digits.joinToString("")
     }
 
-    // Comparison
+
     override operator fun compareTo(other: BigInt): Int {
         if (sign != other.sign) return sign.compareTo(other.sign)
         if (sign == 0) return 0

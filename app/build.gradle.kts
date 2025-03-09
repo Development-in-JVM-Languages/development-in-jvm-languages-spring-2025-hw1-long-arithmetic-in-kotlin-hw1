@@ -26,3 +26,16 @@ tasks.test {
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions.jvmTarget = JVM_21
 }
+
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21)) // Set Java target version
+    }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = "21" // Set Kotlin target version
+    }
+}
