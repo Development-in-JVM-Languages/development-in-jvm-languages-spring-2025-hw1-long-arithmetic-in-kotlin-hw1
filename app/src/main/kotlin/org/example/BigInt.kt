@@ -65,17 +65,28 @@ class BigInt(private val value: String) : Comparable<BigInt> {
         var borrow = 0
         var i = a.size - 1
         var j = b.size - 1
-        while (i >= 0) {
-            val diff = a[i--] - (if (j >= 0) b[j--] else 0) - borrow
+
+        while (i >= 0 || j >= 0) {
+            val digitA = if (i >= 0) a[i] else 0
+            val digitB = if (j >= 0) b[j] else 0
+            var diff = digitA - digitB - borrow
             if (diff < 0) {
-                result.add(diff + 10)
+                diff += 10
                 borrow = 1
             } else {
-                result.add(diff)
                 borrow = 0
             }
+            result.add(0, diff)
+            i--
+            j--
         }
-        return result.reversed()
+
+        // Remove leading zeros
+        while (result.size > 1 && result[0] == 0) {
+            result.removeAt(0)
+        }
+
+        return result
     }
 
     operator fun plus(other: Int): BigInt = this + BigInt(other.toString())
@@ -126,7 +137,7 @@ class BigInt(private val value: String) : Comparable<BigInt> {
 
     // Division
     operator fun div(other: BigInt): BigInt {
-        require(other.sign != 0) { "Division by zero" }
+        if (other.sign == 0) throw ArithmeticException("Division by zero")
         if (sign == 0) return BigInt("0") // 0 divided by any non-zero number is 0
 
         // Divide the absolute values
