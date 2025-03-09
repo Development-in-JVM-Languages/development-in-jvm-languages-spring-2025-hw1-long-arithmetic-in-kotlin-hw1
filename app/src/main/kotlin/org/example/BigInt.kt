@@ -1,3 +1,5 @@
+import java.math.BigInteger
+
 class BigInt(private val value: String) : Comparable<BigInt> {
 
     private var digits: List<Int>
@@ -125,28 +127,38 @@ class BigInt(private val value: String) : Comparable<BigInt> {
     // Division
     operator fun div(other: BigInt): BigInt {
         require(other.sign != 0) { "Division by zero" }
-        if (sign == 0) return BigInt("0")
+        if (sign == 0) return BigInt("0") // 0 divided by any non-zero number is 0
+
+        // Divide the absolute values
         val (quotientDigits, _) = divideDigits(digits, other.digits)
+
         val resultSign = if (sign == other.sign) 1 else -1
+
+
         return BigInt(quotientDigits.joinToString("").let {
             if (resultSign == -1) "-$it" else it
         })
     }
 
     private fun divideDigits(a: List<Int>, b: List<Int>): Pair<List<Int>, List<Int>> {
-        if (compareDigits(a, b) < 0) return Pair(listOf(0), a)
+        if (compareDigits(a, b) < 0) return Pair(listOf(0), a) // If dividend < divisor, quotient is 0
+
         val quotient = mutableListOf<Int>()
         var remainder = mutableListOf<Int>()
         var dividend = a.toMutableList()
+
         for (i in a.indices) {
             remainder.add(dividend[i])
+            // Remove leading zeros from the remainder
             while (remainder.size > 1 && remainder[0] == 0) {
                 remainder.removeAt(0)
             }
+            // If remainder is smaller than the divisor, append 0 to the quotient
             if (compareDigits(remainder, b) < 0) {
                 quotient.add(0)
                 continue
             }
+            // Perform subtraction to find the quotient digit
             var quotientDigit = 0
             while (compareDigits(remainder, b) >= 0) {
                 remainder = subtractDigits(remainder, b).toMutableList()
@@ -154,12 +166,14 @@ class BigInt(private val value: String) : Comparable<BigInt> {
             }
             quotient.add(quotientDigit)
         }
+
+        // Remove leading zeros from the quotient
         while (quotient.size > 1 && quotient[0] == 0) {
             quotient.removeAt(0)
         }
+
         return Pair(quotient, remainder)
     }
-
     operator fun div(other: Int): BigInt = this / BigInt(other.toString())
     operator fun div(other: Short): BigInt = this / BigInt(other.toString())
     operator fun div(other: Byte): BigInt = this / BigInt(other.toString())
@@ -178,21 +192,22 @@ class BigInt(private val value: String) : Comparable<BigInt> {
     operator fun rem(other: Short): BigInt = this % BigInt(other.toString())
     operator fun rem(other: Byte): BigInt = this % BigInt(other.toString())
 
-    // Exponentiation
+
     fun pow(exp: BigInt): BigInt {
         if (exp.sign == 0) return BigInt("1")
         if (sign == 0) return BigInt("0")
         if (exp.sign == -1) throw IllegalArgumentException("Negative exponents are not supported")
+
         var result = BigInt("1")
         var base = this
         var exponent = exp
+
         while (exponent.sign != 0) {
-            if (exponent.digits.last() % 2 == 1) {
-                result *= base
-            }
-            base *= base
-            exponent = exponent / BigInt("2")
+
+            result  *= base
+            exponent = exponent-1
         }
+
         return result
     }
 
