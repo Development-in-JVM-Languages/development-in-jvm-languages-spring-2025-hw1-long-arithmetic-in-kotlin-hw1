@@ -1,5 +1,3 @@
-import java.math.BigInteger
-
 class BigInt(private val value: String) : Comparable<BigInt> {
 
     private var digits: List<Int>
